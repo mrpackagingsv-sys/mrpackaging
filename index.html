@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0A313E">
   <title>Mr.Packaging - Tienda</title>
   <style>
-    /* --- ESTILOS ARQUITECTURA FLEXBOX (APP NATIVA) --- */
+    /* --- ESTILOS WEB RESPONSIVA --- */
     :root {
       --primary-color: #0A313E;
       --secondary-color: #1a4d5e;
@@ -21,21 +21,25 @@
     
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     
-    html, body {
+    body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
       background-color: var(--light-bg);
       color: var(--text-dark);
       font-size: 18px; 
-      width: 100%; height: 100%; overflow: hidden;
+      padding-bottom: 50px;
     }
 
-    .app-wrapper { display: flex; flex-direction: column; width: 100%; height: 100%; }
-
+    /* HEADER Y FILTROS */
     .top-nav-container {
-      flex-shrink: 0; background: var(--primary-color); box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10;
+      position: sticky; top: 0; z-index: 1000;
+      background: var(--primary-color);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
-    header { color: var(--white); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+    header {
+      color: var(--white); padding: 15px 20px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
     .logo { font-size: 1.6rem; font-weight: 900; letter-spacing: 1px; }
     
     .top-cart-container {
@@ -60,21 +64,18 @@
     }
     .filter-btn.active { background-color: var(--buy-color); color: #000; }
 
-    .main-content {
-      flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 90px;
-    }
-
     .container { padding: 20px 15px; max-width: 800px; margin: 0 auto; }
 
+    /* TARJETAS GIGANTES */
     .products-grid { display: flex; flex-direction: column; gap: 40px; }
     
     .product-card {
       background-color: var(--white); border-radius: 20px; box-shadow: var(--shadow); 
-      display: flex; flex-direction: column; overflow: hidden; border: 1px solid #eaeaea;
+      display: flex; flex-direction: column; overflow: hidden;
     }
 
     .product-image-container { 
-      position: relative; width: 100%; height: 380px; 
+      position: relative; width: 100%; height: 400px; 
       background: #fff; border-bottom: 1px solid #f0f0f0; padding: 15px; 
     }
     .product-slide { width: 100%; height: 100%; object-fit: contain; display: none; } 
@@ -97,7 +98,7 @@
     .purchase-controls { display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; background: #fafafa; padding: 15px; border-radius: 16px; border: 1px solid #eee;}
     
     .stepper-container { display: flex; align-items: center; background: var(--white); border-radius: 40px; padding: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #ddd;}
-    .stepper-btn { background: var(--white); border: none; width: 55px; height: 55px; border-radius: 50%; font-size: 2.5rem; color: var(--primary-color); cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; padding-bottom: 6px; transition: background 0.2s; }
+    .stepper-btn { background: var(--white); border: none; width: 60px; height: 60px; border-radius: 50%; font-size: 2.5rem; color: var(--primary-color); cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; padding-bottom: 6px; transition: background 0.2s; }
     .stepper-btn:active { background: #e0e0e0; }
     .stepper-val { width: 75px; text-align: center; font-weight: 900; font-size: 1.6rem; color: var(--text-dark); }
     
@@ -110,10 +111,9 @@
     
     .view-prices-btn { background: transparent; border: none; color: #1565C0; font-weight: 800; font-size: 1.3rem; width: 100%; padding: 20px 0 0 0; text-align: center; text-decoration: underline; cursor: pointer;}
 
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); z-index: 3000; justify-content: center; align-items: flex-end; padding: 10px; }
-    .modal.active { display: flex; }
-    
-    .modal-content { background: var(--light-bg); width: 100%; max-width: 800px; max-height: 90vh; border-radius: 24px 24px 0 0; display: flex; flex-direction: column; overflow: hidden; animation: slideUpWeb 0.3s ease-out; }
+    /* MODAL CARRITO (Toda la pantalla estilo panel) */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--light-bg); z-index: 3000; flex-direction: column; overflow: hidden; }
+    .modal.active { display: flex; animation: slideUpWeb 0.3s ease-out; }
     @keyframes slideUpWeb { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
     .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 25px; background-color: var(--white); color: var(--text-dark); border-bottom: 1px solid #eee; z-index: 2001; }
@@ -121,6 +121,7 @@
     .modal-close { background: #f5f5f5; color: var(--text-dark); border: none; font-size: 2rem; font-weight: bold; width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer;}
     .modal-body { flex: 1; overflow-y: auto; padding: 20px; background: var(--light-bg); -webkit-overflow-scrolling: touch; }
 
+    /* MODALES CENTRADOS (Precios, Salida, Éxito) */
     .modal-centered { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 5000; justify-content: center; align-items: center; padding: 20px; }
     .modal-centered-content { background: white; border-radius: 24px; padding: 30px; width: 100%; max-width: 450px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); text-align: center; animation: scaleUp 0.3s ease-out; }
     @keyframes scaleUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -131,6 +132,7 @@
     .price-qty-col { color: #555; font-weight: 700; }
     .price-val-col { text-align: right !important; font-weight: 900; color: var(--primary-color); font-size: 1.5rem; }
 
+    /* ITEMS CARRITO */
     .cart-item { background: white; padding: 15px; border-radius: 16px; margin-bottom: 15px; display: flex; gap: 15px; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
     .cart-item img { width: 100px; height: 100px; object-fit: contain; border-radius: 12px; background: #f9f9f9; border: 1px solid #eee;}
     .cart-item-name { font-size: 1.3rem; font-weight: 900; margin-bottom: 5px; color: var(--primary-color); line-height: 1.2;}
@@ -141,7 +143,7 @@
     .summary-row { display: flex; justify-content: space-between; font-size: 1.3rem; margin-bottom: 15px; color: #555; font-weight: 700; }
     .summary-total { display: flex; justify-content: space-between; font-size: 2rem; font-weight: 900; color: var(--success-color); border-top: 2px solid #eee; padding-top: 20px; margin-top: 10px; }
 
-    .btn-realizar-pedido { width: 100%; background: var(--buy-color); color: #000; padding: 24px; border: none; border-radius: 16px; font-weight: 900; font-size: 1.6rem; margin-bottom: 30px; cursor: pointer;}
+    .btn-realizar-pedido { width: 100%; background: var(--buy-color); color: #000; padding: 24px; border: none; border-radius: 16px; font-weight: 900; font-size: 1.6rem; box-shadow: 0 4px 15px rgba(255,153,0,0.3); margin-bottom: 30px; cursor: pointer;}
     
     .checkout-form { background:white; padding:25px 20px; border-radius:16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 30px;}
     .checkout-form input, .checkout-form textarea { width: 100%; padding: 18px; border: 2px solid #ddd; border-radius: 12px; font-size: 1.3rem; margin-bottom: 15px; background-color: var(--white); font-weight: 600; outline: none; }
@@ -161,6 +163,7 @@
     .modal-image-content { max-width: 100%; max-height: 100%; object-fit: contain; }
     .close-zoom-fixed { position: absolute; top: 20px; right: 20px; color: white; background: rgba(255,255,255,0.2); border: 2px solid white; width: 60px; height: 60px; border-radius: 50%; font-size: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
+    /* FAB WhatsApp */
     .whatsapp-fab {
       position: fixed; bottom: 30px; right: 25px;
       background-color: #25D366; color: white; width: 70px; height: 70px;
@@ -169,14 +172,13 @@
     }
   </style>
 
-  <!-- SDK DE FIREBASE PARA EL CATÁLOGO RÁPIDO -->
+  <!-- SDK DE FIREBASE -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
-<div class="app-wrapper">
-  <!-- ENCABEZADO -->
+  <!-- HEADER -->
   <div class="top-nav-container">
     <header>
       <div class="logo">MR.PACKAGING</div>
@@ -196,22 +198,20 @@
     </div>
   </div>
 
-  <!-- CATÁLOGO -->
-  <div class="main-content" id="scrollContainer">
-    <div class="container">
-      <div class="products-grid" id="productsGrid">
-        <div class="loading">
-          <div class="spinner"></div>
-          <p style="font-size:1.4rem; color:#666; font-weight:900;">Cargando inventario...</p>
-        </div>
+  <!-- CATÁLOGO PRINCIPAL -->
+  <div class="container">
+    <div class="products-grid" id="productsGrid">
+      <div class="loading">
+        <div class="spinner"></div>
+        <p style="font-size:1.4rem; color:#666; font-weight:900;">Cargando inventario...</p>
       </div>
     </div>
   </div>
-</div> 
 
+  <!-- BOTÓN FLOTANTE WHATSAPP -->
   <a href="https://wa.me/50372635125?text=Hola!%20Tengo%20una%20consulta%20sobre%20empaques" target="_blank" class="whatsapp-fab">💬</a>
 
-  <!-- MODALES -->
+  <!-- MODAL CARRITO -->
   <div class="modal" id="cartModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -222,14 +222,18 @@
     </div>
   </div>
 
+  <!-- MODAL DE PRECIOS CENTRADO -->
   <div class="modal-centered" id="priceModal">
     <div class="modal-centered-content">
       <h2 id="priceModalProductName"></h2>
-      <table class="price-table"><tbody id="priceTableBody"></tbody></table>
+      <table class="price-table">
+        <tbody id="priceTableBody"></tbody>
+      </table>
       <button style="width:100%; padding:18px; background:var(--primary-color); color:white; border-radius:14px; font-size:1.4rem; font-weight:bold; border:none; cursor:pointer;" onclick="closePriceModal()">Entendido</button>
     </div>
   </div>
 
+  <!-- MODAL DE SALIDA (Para el botón atrás del celular) -->
   <div class="modal-centered" id="exitModal">
     <div class="modal-centered-content">
       <h2 style="color:var(--primary-color); margin-bottom:15px; font-size:1.8rem; font-weight:900;">¿Ya te vas?</h2>
@@ -239,15 +243,17 @@
     </div>
   </div>
 
+  <!-- MODAL ÉXITO -->
   <div class="modal-centered" id="successModal">
     <div class="modal-centered-content">
       <div style="font-size: 80px; color: #4CAF50; margin: 0 auto 20px auto; background: #e8f5e9; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">✓</div>
       <h2 style="color:var(--primary-color); font-size:2.2rem; margin-bottom:15px; font-weight:900;">¡Orden Recibida!</h2>
-      <p style="color: #666; margin-bottom: 30px; font-size: 1.3rem; line-height: 1.4;">Tu pedido ha sido registrado y enviado al WhatsApp/Correo.</p>
+      <p style="color: #666; margin-bottom: 30px; font-size: 1.3rem; line-height: 1.4;">Tu pedido ha sido procesado exitosamente y enviado a WhatsApp/Correo.</p>
       <button style="width:100%; padding:18px; background:var(--primary-color); color:white; border-radius:14px; font-size:1.4rem; font-weight:bold; border:none; cursor:pointer;" onclick="closeSuccessModal()">Volver a la Tienda</button>
     </div>
   </div>
 
+  <!-- MODAL ZOOM IMAGEN -->
   <div class="modal-image-overlay" id="imageZoomModal">
     <button class="close-zoom-fixed" onclick="closeImageModal()">×</button>
     <img src="" class="modal-image-content" id="imgZoomContent">
@@ -256,13 +262,13 @@
   <div class="notification" id="notification"></div>
 
   <script>
-    // --- VARIABLES CLAVE PARA GITHUB PAGES ---
+    // --- 1. CONFIGURACIÓN FIREBASE ---
     const firebaseConfig = { databaseURL: "https://mrpackaging-app-default-rtdb.firebaseio.com" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // ¡IMPORTANTE! Pega aquí la URL de tu despliegue de Apps Script 
-    const GAS_BACKEND_URL = "PEGAR_AQUI_URL_DE_APPS_SCRIPT";
+    // --- 2. URL DE TU APPS SCRIPT (Ya inyectada) ---
+    const GAS_BACKEND_URL = "https://script.google.com/macros/s/AKfycbzkwSabpbFMQix9GEBhP0TxkLNbc2ZekjvKW29irDgLMDafuqHfTTI43JvK7oucXtXx/exec";
 
     let products = [];
     let cart = [];
@@ -270,6 +276,7 @@
     const DELIVERY_FEE = 3.50;
     let productSlideIndices = {}; 
 
+    // --- TRAMPA DEL BOTÓN ATRÁS (Mantiene al usuario en la web) ---
     window.onload = function() { 
       history.pushState({page: 'trampa_salida'}, '', '#app');
       history.pushState({page: 'tienda_principal'}, '', '#tienda');
@@ -296,6 +303,7 @@
     function cancelExit() { document.getElementById('exitModal').style.display = 'none'; history.pushState({page: 'tienda_principal'}, '', '#tienda'); }
     function confirmExit() { history.go(-2); }
 
+    // --- CARGA DE PRODUCTOS DESDE FIREBASE ---
     async function loadProducts() {
       try {
         const snapshot = await db.ref('productos').once('value');
@@ -322,8 +330,7 @@
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       if(btn) btn.classList.add('active');
       renderProducts();
-      const scrollCont = document.getElementById('scrollContainer');
-      if (scrollCont) { scrollCont.scrollTo({ top: 0, behavior: 'smooth' }); }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function calculatePrice(quantity, priceTiers) {
@@ -334,12 +341,15 @@
       return priceTiers.tier5;
     }
 
+    // --- MÚLTIPLOS EXACTOS DE 25 ---
     function updateQty(productId, isPlus) {
       const display = document.getElementById(`qty-display-${productId}`);
       let current = parseInt(display.innerText) || 25; 
       let next = isPlus ? current + 25 : current - 25;
+      
       if (next < 25) { showNotification('El mínimo es 25 unidades', 'error'); next = 25; }
       if (next > 1000) { showNotification('Máximo 1000 unidades', 'error'); next = 1000; }
+      
       display.innerText = next; updatePricePreview(productId);
     }
 
@@ -443,18 +453,18 @@
       if (document.getElementById('bot_field') && document.getElementById('bot_field').value !== "") return; 
       const name = document.getElementById('cName').value.trim(); const email = document.getElementById('cEmail').value.trim();
       const phone = document.getElementById('cPhone').value.trim(); const address = document.getElementById('cAddress').value.trim();
+      
       if (!name || !email || !phone || !address) { showNotification('Completa todos tus datos de envío', 'error'); return; }
-      if (GAS_BACKEND_URL === "PEGAR_AQUI_URL_DE_APPS_SCRIPT") { alert("Aún no has configurado la URL de Apps Script en el código HTML."); return; }
       
       const btn = document.querySelector('.checkout-btn');
       btn.disabled = true; btn.textContent = 'Procesando...';
 
       const orderData = { customerName: name, customerEmail: email, customerPhone: phone, customerAddress: address, items: cart };
 
-      // --- CAMBIO PARA GITHUB PAGES: USAMOS FETCH HACIA LA API DE APPS SCRIPT ---
+      // --- CONEXIÓN GITHUB PAGES A GOOGLE APPS SCRIPT ---
       fetch(GAS_BACKEND_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // text/plain evita los bloqueos de CORS del navegador
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // 'text/plain' es un truco maestro para evitar que el navegador bloquee la petición por temas de seguridad (CORS)
         body: JSON.stringify(orderData)
       })
       .then(response => response.json())
@@ -464,7 +474,7 @@
         } else { showNotification('Error: ' + res.message, 'error'); btn.disabled = false; btn.textContent = 'CONFIRMAR PEDIDO'; }
       })
       .catch(error => {
-        // Fallback por si Apps Script hace una redirección extraña pero igual guarda el dato
+        // Fallback: A veces Google no retorna el JSON correcto tras el redireccionamiento, pero sí guarda el pedido en Sheets.
         console.log("Petición completada", error);
         cart = []; updateCartCount(); closeCart(); document.getElementById('successModal').style.display = 'flex';
       });
