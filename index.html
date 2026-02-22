@@ -163,7 +163,7 @@
     .modal-image-content { max-width: 100%; max-height: 100%; object-fit: contain; }
     .close-zoom-fixed { position: absolute; top: 20px; right: 20px; color: white; background: rgba(255,255,255,0.2); border: 2px solid white; width: 60px; height: 60px; border-radius: 50%; font-size: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
-    /* FAB WhatsApp */
+    /* FAB WhatsApp Responsivo */
     .whatsapp-fab {
       position: fixed; bottom: 30px; right: 25px;
       background-color: #25D366; color: white; width: 70px; height: 70px;
@@ -172,16 +172,18 @@
     }
   </style>
 
-  <!-- SDK DE FIREBASE -->
+  <!-- SDK DE FIREBASE PARA EL CATÁLOGO RÁPIDO -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
-  <!-- HEADER -->
+  <!-- HEADER Y FILTROS STICKY -->
   <div class="top-nav-container">
     <header>
       <div class="logo">MR.PACKAGING</div>
+      
+      <!-- Botón de Carrito Mejorado -->
       <div class="top-cart-container" onclick="openCart()">
         <span class="top-cart-icon">🛒</span>
         <span class="top-cart-text">Pedido</span>
@@ -198,7 +200,7 @@
     </div>
   </div>
 
-  <!-- CATÁLOGO PRINCIPAL -->
+  <!-- CATÁLOGO PRINCIPAL CON SCROLL NATIVO -->
   <div class="container">
     <div class="products-grid" id="productsGrid">
       <div class="loading">
@@ -208,10 +210,9 @@
     </div>
   </div>
 
-  <!-- BOTÓN FLOTANTE WHATSAPP -->
   <a href="https://wa.me/50372635125?text=Hola!%20Tengo%20una%20consulta%20sobre%20empaques" target="_blank" class="whatsapp-fab">💬</a>
 
-  <!-- MODAL CARRITO -->
+  <!-- MODAL CARRITO (Flujo Web Tradicional) -->
   <div class="modal" id="cartModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -233,11 +234,12 @@
     </div>
   </div>
 
-  <!-- MODAL DE SALIDA (Para el botón atrás del celular) -->
+  <!-- MODAL DE SALIDA (Para el botón atrás) -->
   <div class="modal-centered" id="exitModal">
     <div class="modal-centered-content">
       <h2 style="color:var(--primary-color); margin-bottom:15px; font-size:1.8rem; font-weight:900;">¿Ya te vas?</h2>
       <p id="exitModalText" style="color:#666; margin-bottom:25px; font-size:1.3rem; line-height:1.4;"></p>
+      
       <button style="width:100%; padding:18px; background:var(--primary-color); color:white; border-radius:14px; font-size:1.4rem; font-weight:bold; border:none; margin-bottom:15px; cursor:pointer;" onclick="cancelExit()">Seguir comprando</button>
       <button style="width:100%; padding:18px; background:transparent; color:var(--accent-color); border-radius:14px; font-size:1.4rem; font-weight:bold; border:2px solid var(--accent-color); cursor:pointer;" onclick="confirmExit()">Salir de la tienda</button>
     </div>
@@ -248,12 +250,12 @@
     <div class="modal-centered-content">
       <div style="font-size: 80px; color: #4CAF50; margin: 0 auto 20px auto; background: #e8f5e9; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">✓</div>
       <h2 style="color:var(--primary-color); font-size:2.2rem; margin-bottom:15px; font-weight:900;">¡Orden Recibida!</h2>
-      <p style="color: #666; margin-bottom: 30px; font-size: 1.3rem; line-height: 1.4;">Tu pedido ha sido procesado exitosamente y enviado a WhatsApp/Correo.</p>
+      <p style="color: #666; margin-bottom: 30px; font-size: 1.3rem; line-height: 1.4;">Hemos enviado los detalles a tu correo electrónico.</p>
       <button style="width:100%; padding:18px; background:var(--primary-color); color:white; border-radius:14px; font-size:1.4rem; font-weight:bold; border:none; cursor:pointer;" onclick="closeSuccessModal()">Volver a la Tienda</button>
     </div>
   </div>
 
-  <!-- MODAL ZOOM IMAGEN -->
+  <!-- MODAL ZOOM -->
   <div class="modal-image-overlay" id="imageZoomModal">
     <button class="close-zoom-fixed" onclick="closeImageModal()">×</button>
     <img src="" class="modal-image-content" id="imgZoomContent">
@@ -262,12 +264,12 @@
   <div class="notification" id="notification"></div>
 
   <script>
-    // --- 1. CONFIGURACIÓN FIREBASE ---
+    // --- VARIABLES CLAVE PARA GITHUB PAGES ---
     const firebaseConfig = { databaseURL: "https://mrpackaging-app-default-rtdb.firebaseio.com" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // --- 2. URL DE TU APPS SCRIPT (Ya inyectada) ---
+    // ¡IMPORTANTE! Pega aquí la URL de tu despliegue de Apps Script 
     const GAS_BACKEND_URL = "https://script.google.com/macros/s/AKfycbzkwSabpbFMQix9GEBhP0TxkLNbc2ZekjvKW29irDgLMDafuqHfTTI43JvK7oucXtXx/exec";
 
     let products = [];
@@ -276,7 +278,6 @@
     const DELIVERY_FEE = 3.50;
     let productSlideIndices = {}; 
 
-    // --- TRAMPA DEL BOTÓN ATRÁS (Mantiene al usuario en la web) ---
     window.onload = function() { 
       history.pushState({page: 'trampa_salida'}, '', '#app');
       history.pushState({page: 'tienda_principal'}, '', '#tienda');
@@ -309,15 +310,18 @@
         const snapshot = await db.ref('productos').once('value');
         const data = snapshot.val();
         if (data) {
-          products = Object.values(data).filter(p => p !== null).map(p => {
-            let imgArray = p.image ? p.image.toString().split(',').map(url => url.trim()).filter(url => url !== "") : [];
-            if (imgArray.length === 0) imgArray = ['https://via.placeholder.com/300?text=No+Image'];
-            return {
-              id: p.id, name: p.name, category: p.category, description: p.description,
-              images: imgArray, colors: Array.isArray(p.colors) ? p.colors : [p.colors], 
-              priceTiers: p.priceTiers, stock: p.stock
-            };
-          });
+          // Filtramos solo los productos donde Activo sea igual a "Sí" o "Si"
+          products = Object.values(data)
+            .filter(p => p !== null && (p.activo === 'Sí' || p.activo === 'Si' || p.activo === 'sí' || p.activo === 'si'))
+            .map(p => {
+              let imgArray = p.image ? p.image.toString().split(',').map(url => url.trim()).filter(url => url !== "") : [];
+              if (imgArray.length === 0) imgArray = ['https://via.placeholder.com/300?text=No+Image'];
+              return {
+                id: p.id, name: p.name, category: p.category, description: p.description,
+                images: imgArray, colors: Array.isArray(p.colors) ? p.colors : [p.colors], 
+                priceTiers: p.priceTiers, stock: p.stock, activo: p.activo
+              };
+            });
         }
         renderProducts();
         const loader = document.querySelector('.loading');
@@ -330,7 +334,7 @@
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       if(btn) btn.classList.add('active');
       renderProducts();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo(0, 0); 
     }
 
     function calculatePrice(quantity, priceTiers) {
@@ -341,15 +345,12 @@
       return priceTiers.tier5;
     }
 
-    // --- MÚLTIPLOS EXACTOS DE 25 ---
     function updateQty(productId, isPlus) {
       const display = document.getElementById(`qty-display-${productId}`);
       let current = parseInt(display.innerText) || 25; 
       let next = isPlus ? current + 25 : current - 25;
-      
       if (next < 25) { showNotification('El mínimo es 25 unidades', 'error'); next = 25; }
       if (next > 1000) { showNotification('Máximo 1000 unidades', 'error'); next = 1000; }
-      
       display.innerText = next; updatePricePreview(productId);
     }
 
