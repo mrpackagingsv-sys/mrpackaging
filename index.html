@@ -49,9 +49,11 @@
     .top-cart-container:active { background: rgba(255,255,255,0.3); }
     .top-cart-icon { font-size: 1.2rem; line-height: 1;}
     .top-cart-text { font-weight: bold; font-size: 1rem; color: white;}
+    
+    /* BADGE CORREGIDO (Forma de Píldora para alojar hasta 4 dígitos sin montarse) */
     .top-cart-badge {
-      background: var(--buy-color); color: #000; border-radius: 50%; 
-      width: 24px; height: 24px; font-size: 0.95rem; font-weight: 900; 
+      background: var(--buy-color); color: #000; border-radius: 12px; 
+      min-width: 24px; height: 24px; padding: 0 6px; font-size: 0.95rem; font-weight: 900; 
       display: flex; justify-content: center; align-items: center; 
     }
 
@@ -133,12 +135,18 @@
     .price-qty-col { color: #555; font-weight: 700; }
     .price-val-col { text-align: right !important; font-weight: 900; color: var(--primary-color); font-size: 1.3rem; }
 
-    /* CARRITO */
-    .cart-item { background: white; padding: 12px; border-radius: 14px; margin-bottom: 12px; display: flex; gap: 15px; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+    /* CARRITO DE COMPRAS CON CONTROLES */
+    .cart-item { background: white; padding: 15px; border-radius: 14px; margin-bottom: 12px; display: flex; gap: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
     .cart-item img { width: 80px; height: 80px; object-fit: contain; border-radius: 10px; background: #f9f9f9; border: 1px solid #eee;}
     .cart-item-name { font-size: 1.1rem; font-weight: 900; margin-bottom: 4px; color: var(--primary-color); line-height: 1.2;}
     .cart-item-details { font-size: 0.95rem; color: #666; font-weight: 600;}
-    .cart-remove-btn { background: #ffebee; color: var(--accent-color); border: none; padding: 8px 12px; border-radius: 8px; font-weight: 900; font-size: 0.9rem; margin-top: 6px; cursor: pointer;}
+    
+    .cart-item-controls { display: flex; align-items: center; background: #f9f9f9; border-radius: 20px; padding: 2px; border: 1px solid #eee; }
+    .cart-stepper-btn { background: var(--white); border: 1px solid #ddd; width: 32px; height: 32px; border-radius: 50%; font-size: 1.5rem; color: var(--primary-color); cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; padding-bottom: 3px; transition: background 0.2s; }
+    .cart-stepper-btn:active { background: #e0e0e0; }
+    .cart-stepper-val { width: 45px; text-align: center; font-weight: 900; font-size: 1.1rem; color: var(--text-dark); }
+    
+    .cart-remove-btn { background: #ffebee; color: var(--accent-color); border: none; padding: 6px 12px; border-radius: 8px; font-weight: 900; font-size: 0.9rem; cursor: pointer;}
     
     .cart-summary { background: white; padding: 20px; border-radius: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); margin-top: 15px; margin-bottom: 15px; }
     .summary-row { display: flex; justify-content: space-between; font-size: 1.1rem; margin-bottom: 12px; color: #555; font-weight: 700; }
@@ -457,8 +465,9 @@
       const display = document.getElementById(`qty-display-${productId}`);
       
       const cat = product.category ? product.category.toLowerCase() : '';
-      let min = 25;
-      if (cat === 'tag') min = 100; else if (cat === 'papel seda') min = 50;
+      let min = 25, step = 25;
+      if (cat === 'tag') { min = 100; step = 100; }
+      else if (cat === 'papel seda') { min = 50; step = 50; }
 
       const quantityToAdd = parseInt(display.innerText) || min;
       
@@ -473,9 +482,9 @@
         cart[existingItemIndex].unitPrice = calculatePrice(cart[existingItemIndex].quantity, product.priceTiers);
         cart[existingItemIndex].total = cart[existingItemIndex].unitPrice * cart[existingItemIndex].quantity;
       } else {
-        // Se agrega como nuevo
+        // Se agrega como nuevo y se guarda su min y step para el carrito
         const unitPrice = calculatePrice(quantityToAdd, product.priceTiers);
-        cart.push({ id: product.id, name: product.name, image: product.images[0], color: color, quantity: quantityToAdd, unitPrice: unitPrice, total: unitPrice * quantityToAdd });
+        cart.push({ id: product.id, name: product.name, image: product.images[0], color: color, quantity: quantityToAdd, unitPrice: unitPrice, total: unitPrice * quantityToAdd, min: min, step: step });
       }
 
       updateCartCount(); 
@@ -484,6 +493,30 @@
       // Reinicia visualmente la cantidad al mínimo de su categoría
       display.innerText = min; 
       updatePricePreview(productId);
+    }
+
+    // --- NUEVO: FUNCIÓN PARA ALTERAR CANTIDADES DENTRO DEL CARRITO ---
+    function updateCartItemQty(index, direction) {
+      let item = cart[index];
+      let next = item.quantity + (direction * item.step);
+      
+      if (next < item.min) { 
+        showNotification(`El mínimo es ${item.min} unidades`, 'error'); 
+        return; 
+      }
+      if (next > 1000) { 
+        showNotification('Máximo 1000 unidades', 'error'); 
+        return; 
+      }
+      
+      const product = products.find(p => p.id === item.id);
+      if (product) {
+        item.quantity = next;
+        item.unitPrice = calculatePrice(item.quantity, product.priceTiers);
+        item.total = item.unitPrice * item.quantity;
+        updateCartCount();
+        renderCart(); // Vuelve a dibujar el carrito al instante
+      }
     }
 
     function updateCartCount() { document.getElementById('topCartCount').textContent = cart.reduce((sum, item) => sum + item.quantity, 0); }
@@ -497,7 +530,27 @@
       const subtotal = cart.reduce((sum, item) => sum + item.total, 0); const total = subtotal + DELIVERY_FEE;
       let itemsHtml = `<div>`;
       cart.forEach((item, index) => {
-        itemsHtml += `<div class="cart-item"><img src="${item.image}"><div style="flex:1;"><div class="cart-item-name">${item.name}</div><div class="cart-item-details">${item.color} | Cantidad: ${item.quantity}</div><div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;"><div style="font-weight:900; font-size:1.2rem; color:var(--text-dark);">$${item.total.toFixed(2)}</div><button class="cart-remove-btn" onclick="removeFromCart(${index})">Quitar</button></div></div></div>`;
+        itemsHtml += `
+          <div class="cart-item">
+            <img src="${item.image}">
+            <div style="flex:1;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div>
+                  <div class="cart-item-name">${item.name}</div>
+                  <div class="cart-item-details">${item.color}</div>
+                </div>
+                <button class="cart-remove-btn" style="margin-top:0; padding: 6px 10px; font-size: 0.85rem;" onclick="removeFromCart(${index})">Quitar</button>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                <div class="cart-item-controls">
+                  <button type="button" class="cart-stepper-btn" onclick="updateCartItemQty(${index}, -1)">-</button>
+                  <div class="cart-stepper-val">${item.quantity}</div>
+                  <button type="button" class="cart-stepper-btn" onclick="updateCartItemQty(${index}, 1)">+</button>
+                </div>
+                <div style="font-weight:900; font-size:1.3rem; color:var(--text-dark);">$${item.total.toFixed(2)}</div>
+              </div>
+            </div>
+          </div>`;
       });
       itemsHtml += `</div><div class="cart-summary"><div class="summary-row"><span>Subtotal</span><span>$${subtotal.toFixed(2)}</span></div><div class="summary-row"><span>Envío</span><span>$${DELIVERY_FEE.toFixed(2)}</span></div><div class="summary-total"><span>Total a Pagar</span><span>$${total.toFixed(2)}</span></div></div>`;
       
