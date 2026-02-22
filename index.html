@@ -25,7 +25,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
       background-color: var(--light-bg);
       color: var(--text-dark);
-      font-size: 15px; /* TAMAÑO BASE REDUCIDO PARA PROPORCIONES MÁS ELEGANTES */
+      font-size: 15px; 
       padding-bottom: 50px;
     }
 
@@ -144,7 +144,8 @@
     .summary-row { display: flex; justify-content: space-between; font-size: 1.1rem; margin-bottom: 12px; color: #555; font-weight: 700; }
     .summary-total { display: flex; justify-content: space-between; font-size: 1.5rem; font-weight: 900; color: var(--success-color); border-top: 2px solid #eee; padding-top: 15px; margin-top: 5px; }
 
-    .btn-realizar-pedido { width: 100%; background: var(--buy-color); color: #000; padding: 18px; border: none; border-radius: 14px; font-weight: 900; font-size: 1.3rem; box-shadow: 0 4px 10px rgba(255,153,0,0.3); margin-bottom: 25px; cursor: pointer;}
+    .btn-realizar-pedido { width: 100%; background: var(--buy-color); color: #000; padding: 18px; border: none; border-radius: 14px; font-weight: 900; font-size: 1.3rem; box-shadow: 0 4px 10px rgba(255,153,0,0.3); margin-bottom: 15px; cursor: pointer;}
+    .btn-seguir-comprando { width: 100%; background: #e0e0e0; color: var(--text-dark); padding: 18px; border: none; border-radius: 14px; font-weight: 900; font-size: 1.1rem; margin-bottom: 25px; cursor: pointer; }
     
     .checkout-form { background:white; padding:20px; border-radius:14px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); margin-bottom: 25px;}
     .checkout-form input, .checkout-form textarea { width: 100%; padding: 14px; border: 2px solid #ddd; border-radius: 10px; font-size: 1.1rem; margin-bottom: 12px; background-color: var(--white); font-weight: 600; outline: none; }
@@ -274,7 +275,8 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    const GAS_BACKEND_URL = "https://script.google.com/macros/s/AKfycbzkwSabpbFMQix9GEBhP0TxkLNbc2ZekjvKW29irDgLMDafuqHfTTI43JvK7oucXtXx/exec";
+    // NUEVA URL DE APPS SCRIPT
+    const GAS_BACKEND_URL = "https://script.google.com/macros/s/AKfycbxWFWBYrdXloFRtzlSMJ8ijlss36gABiSZ9N9ovWYnXo3isEFR7jqhi7h8VNttIm6aO/exec";
 
     let products = [];
     let cart = [];
@@ -347,13 +349,25 @@
       return priceTiers.tier5;
     }
 
+    // --- REGLAS POR CATEGORÍA PARA MINIMOS Y SALTOS ---
     function updateQty(productId, isPlus) {
+      const product = products.find(p => p.id === productId);
+      const cat = product.category ? product.category.toLowerCase() : '';
+      
+      let min = 25, step = 25;
+      if (cat === 'tag') { min = 100; step = 100; }
+      else if (cat === 'papel seda') { min = 50; step = 50; }
+
       const display = document.getElementById(`qty-display-${productId}`);
-      let current = parseInt(display.innerText) || 25; 
-      let next = isPlus ? current + 25 : current - 25;
-      if (next < 25) { showNotification('El mínimo es 25 unidades', 'error'); next = 25; }
+      let current = parseInt(display.innerText) || min; 
+      
+      let next = isPlus ? current + step : current - step;
+      
+      if (next < min) { showNotification(`El mínimo es ${min} unidades`, 'error'); next = min; }
       if (next > 1000) { showNotification('Máximo 1000 unidades', 'error'); next = 1000; }
-      display.innerText = next; updatePricePreview(productId);
+      
+      display.innerText = next; 
+      updatePricePreview(productId);
     }
 
     function renderProducts() {
@@ -380,14 +394,20 @@
             colorOptionsHtml = `<select class="color-select" id="color-${product.id}">${product.colors.map(c => `<option value="${c.trim()}">${c.trim()}</option>`).join('')}</select>`;
         } else { colorOptionsHtml = `<input type="hidden" id="color-${product.id}" value="Estándar">`; }
 
-        const initialTotal = calculatePrice(25, product.priceTiers) * 25;
+        // Inicialización del mínimo y precio basado en categoría
+        const cat = product.category ? product.category.toLowerCase() : '';
+        let min = 25;
+        if (cat === 'tag') min = 100;
+        else if (cat === 'papel seda') min = 50;
+
+        const initialTotal = calculatePrice(min, product.priceTiers) * min;
 
         card.innerHTML = `
           <div class="product-image-container">${imagesHtml}${navHtml}</div>
           <div class="product-info">
             <div class="product-header-row"><div class="product-titles"><h3 class="product-name">${product.name}</h3><div class="product-description">${product.description}</div></div>${colorOptionsHtml}</div>
             <div class="purchase-controls">
-              <div class="stepper-container"><button type="button" class="stepper-btn" onclick="updateQty('${product.id}', false)">-</button><div class="stepper-val" id="qty-display-${product.id}">25</div><button type="button" class="stepper-btn" onclick="updateQty('${product.id}', true)">+</button></div>
+              <div class="stepper-container"><button type="button" class="stepper-btn" onclick="updateQty('${product.id}', false)">-</button><div class="stepper-val" id="qty-display-${product.id}">${min}</div><button type="button" class="stepper-btn" onclick="updateQty('${product.id}', true)">+</button></div>
               <div class="total-preview-container"><div class="total-label">Subtotal</div><div class="total-preview" id="preview-${product.id}">$${initialTotal.toFixed(2)}</div></div>
             </div>
             <button class="add-to-cart-btn" onclick="addToCart('${product.id}')">🛒 Agregar al Pedido</button>
@@ -419,17 +439,51 @@
 
     function updatePricePreview(productId) {
       const product = products.find(p => p.id === productId);
-      const quantity = parseInt(document.getElementById(`qty-display-${productId}`).innerText) || 25;
+      const display = document.getElementById(`qty-display-${productId}`);
+      
+      const cat = product.category ? product.category.toLowerCase() : '';
+      let min = 25;
+      if (cat === 'tag') min = 100; else if (cat === 'papel seda') min = 50;
+
+      const quantity = parseInt(display.innerText) || min;
       document.getElementById(`preview-${productId}`).textContent = `$${(calculatePrice(quantity, product.priceTiers) * quantity).toFixed(2)}`;
     }
 
+    // --- AGRUPACIÓN EN EL CARRITO ---
     function addToCart(productId) {
-      const product = products.find(p => p.id === productId); const colorInput = document.getElementById(`color-${productId}`);
-      const quantity = parseInt(document.getElementById(`qty-display-${productId}`).innerText) || 25;
-      const unitPrice = calculatePrice(quantity, product.priceTiers);
-      cart.push({ id: product.id, name: product.name, image: product.images[0], color: colorInput ? colorInput.value : "Estándar", quantity: quantity, unitPrice: unitPrice, total: unitPrice * quantity });
-      updateCartCount(); showNotification('¡Agregado a tu pedido!');
-      document.getElementById(`qty-display-${productId}`).innerText = "25"; updatePricePreview(productId);
+      const product = products.find(p => p.id === productId); 
+      const colorInput = document.getElementById(`color-${productId}`);
+      const color = colorInput ? colorInput.value : "Estándar";
+      const display = document.getElementById(`qty-display-${productId}`);
+      
+      const cat = product.category ? product.category.toLowerCase() : '';
+      let min = 25;
+      if (cat === 'tag') min = 100; else if (cat === 'papel seda') min = 50;
+
+      const quantityToAdd = parseInt(display.innerText) || min;
+      
+      // Validamos si el producto con ESE color ya está en el carrito
+      const existingItemIndex = cart.findIndex(item => item.id === product.id && item.color === color);
+
+      if (existingItemIndex > -1) {
+        // Se suma a la cantidad existente y se recalcula a un precio mejor si aplica
+        cart[existingItemIndex].quantity += quantityToAdd;
+        if (cart[existingItemIndex].quantity > 1000) cart[existingItemIndex].quantity = 1000;
+        
+        cart[existingItemIndex].unitPrice = calculatePrice(cart[existingItemIndex].quantity, product.priceTiers);
+        cart[existingItemIndex].total = cart[existingItemIndex].unitPrice * cart[existingItemIndex].quantity;
+      } else {
+        // Se agrega como nuevo
+        const unitPrice = calculatePrice(quantityToAdd, product.priceTiers);
+        cart.push({ id: product.id, name: product.name, image: product.images[0], color: color, quantity: quantityToAdd, unitPrice: unitPrice, total: unitPrice * quantityToAdd });
+      }
+
+      updateCartCount(); 
+      showNotification('¡Agregado a tu pedido!');
+      
+      // Reinicia visualmente la cantidad al mínimo de su categoría
+      display.innerText = min; 
+      updatePricePreview(productId);
     }
 
     function updateCartCount() { document.getElementById('topCartCount').textContent = cart.reduce((sum, item) => sum + item.quantity, 0); }
@@ -438,14 +492,23 @@
 
     function renderCart() {
       const cartContent = document.getElementById('cartContent');
-      if (cart.length === 0) { cartContent.innerHTML = '<div style="text-align:center; padding-top:60px;"><div style="font-size:5rem; opacity:0.2; margin-bottom:15px;">🛒</div><h3 style="color:#444; font-size:1.5rem;">Tu pedido está vacío</h3></div>'; return; }
+      if (cart.length === 0) { cartContent.innerHTML = '<div style="text-align:center; padding-top:60px;"><div style="font-size:5rem; opacity:0.2; margin-bottom:15px;">🛒</div><h3 style="color:#444; font-size:1.5rem; margin-bottom: 20px;">Tu pedido está vacío</h3><button class="btn-seguir-comprando" onclick="closeCart()">Agregar productos</button></div>'; return; }
+      
       const subtotal = cart.reduce((sum, item) => sum + item.total, 0); const total = subtotal + DELIVERY_FEE;
       let itemsHtml = `<div>`;
       cart.forEach((item, index) => {
         itemsHtml += `<div class="cart-item"><img src="${item.image}"><div style="flex:1;"><div class="cart-item-name">${item.name}</div><div class="cart-item-details">${item.color} | Cantidad: ${item.quantity}</div><div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;"><div style="font-weight:900; font-size:1.2rem; color:var(--text-dark);">$${item.total.toFixed(2)}</div><button class="cart-remove-btn" onclick="removeFromCart(${index})">Quitar</button></div></div></div>`;
       });
       itemsHtml += `</div><div class="cart-summary"><div class="summary-row"><span>Subtotal</span><span>$${subtotal.toFixed(2)}</span></div><div class="summary-row"><span>Envío</span><span>$${DELIVERY_FEE.toFixed(2)}</span></div><div class="summary-total"><span>Total a Pagar</span><span>$${total.toFixed(2)}</span></div></div>`;
-      cartContent.innerHTML = `<div id="cartView">${itemsHtml}<button class="btn-realizar-pedido" onclick="showCheckoutForm()">PROCEDER AL PAGO</button></div><div id="checkoutView" style="display:none;"><div class="checkout-form"><h3 style="color:var(--text-dark); margin-bottom:20px; font-size:1.3rem; font-weight:900;">Detalles de Entrega</h3><input type="text" id="bot_field" style="display:none" tabindex="-1"><input type="text" id="cName" placeholder="Nombre completo"><input type="email" id="cEmail" placeholder="Correo electrónico"><input type="tel" id="cPhone" placeholder="Teléfono"><textarea id="cAddress" placeholder="Dirección completa" rows="3"></textarea><button class="checkout-btn" onclick="processCheckout()">CONFIRMAR PEDIDO</button><button class="btn-volver-carrito" onclick="hideCheckoutForm()">Volver al resumen</button></div></div>`;
+      
+      cartContent.innerHTML = `
+        <div id="cartView">
+          ${itemsHtml}
+          <!-- BOTÓN ACTUALIZADO Y BOTÓN SEGUIR COMPRANDO -->
+          <button class="btn-realizar-pedido" onclick="showCheckoutForm()">REALIZAR PEDIDO</button>
+          <button class="btn-seguir-comprando" onclick="closeCart()">Agregar más productos</button>
+        </div>
+        <div id="checkoutView" style="display:none;"><div class="checkout-form"><h3 style="color:var(--text-dark); margin-bottom:20px; font-size:1.3rem; font-weight:900;">Detalles de Entrega</h3><input type="text" id="bot_field" style="display:none" tabindex="-1"><input type="text" id="cName" placeholder="Nombre completo"><input type="email" id="cEmail" placeholder="Correo electrónico"><input type="tel" id="cPhone" placeholder="Teléfono"><textarea id="cAddress" placeholder="Dirección completa" rows="3"></textarea><button class="checkout-btn" onclick="processCheckout()">CONFIRMAR PEDIDO</button><button class="btn-volver-carrito" onclick="hideCheckoutForm()">Volver al resumen</button></div></div>`;
     }
 
     function showCheckoutForm() { document.getElementById('cartView').style.display = 'none'; document.getElementById('checkoutView').style.display = 'block'; }
