@@ -29,7 +29,6 @@
     }
     
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-    
     body { background-color: var(--bg-light); color: var(--text-dark); line-height: 1.5; padding-bottom: 60px; overflow-x: hidden; }
 
     /* --- HEADER --- */
@@ -72,28 +71,30 @@
 
     /* --- VISTA: HOME / LANDING --- */
     .hero-section {
-      background: linear-gradient(135deg, var(--primary) 0%, #1a4d5e 100%);
+      /* Imagen de fondo temporal de alta calidad para empaques */
+      background-image: linear-gradient(135deg, rgba(10, 49, 62, 0.85) 0%, rgba(26, 77, 94, 0.7) 100%), url('https://images.unsplash.com/photo-1605600659873-d808a1d14f48?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+      background-size: cover;
+      background-position: center;
       color: white;
-      padding: 60px 5%;
+      padding: 80px 5%;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
       text-align: left;
       position: relative;
-      overflow: hidden;
     }
     .hero-content { max-width: 600px; z-index: 2; }
-    .hero-title { font-size: 2.8rem; font-weight: 900; line-height: 1.1; margin-bottom: 20px; }
-    .hero-subtitle { font-size: 1.1rem; opacity: 0.9; margin-bottom: 30px; line-height: 1.5; }
+    .hero-title { font-size: 3rem; font-weight: 900; line-height: 1.1; margin-bottom: 20px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+    .hero-subtitle { font-size: 1.15rem; opacity: 0.95; margin-bottom: 30px; line-height: 1.5; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
     .btn-cta { background: var(--accent); color: #000; font-weight: 900; font-size: 1.1rem; padding: 14px 32px; border-radius: 30px; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4); transition: transform 0.2s; }
     .btn-cta:hover { transform: scale(1.05); }
     
     .section-title { text-align: center; color: var(--primary); font-size: 2rem; font-weight: 900; margin: 50px 0 30px 0; }
     
     .categories-home { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 0 5%; max-width: 1200px; margin: 0 auto; }
-    .cat-card { background: var(--bg-white); border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-md); cursor: pointer; transition: transform 0.2s; }
-    .cat-card:hover { transform: translateY(-5px); }
-    .cat-img { width: 100%; height: 180px; background: #e5e7eb; object-fit: cover; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: #9ca3af; }
+    .cat-card { background: var(--bg-white); border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-md); cursor: pointer; transition: transform 0.2s; border: 1px solid var(--border-color); }
+    .cat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+    .cat-img { width: 100%; height: 180px; background: var(--bg-light); object-fit: cover; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; color: #9ca3af; }
     .cat-info { background: var(--primary); color: white; padding: 20px; }
     .cat-info h3 { font-size: 1.2rem; font-weight: 800; margin-bottom: 5px; }
     .cat-info p { font-size: 0.9rem; opacity: 0.8; }
@@ -107,94 +108,113 @@
     @media (min-width: 768px) { .catalog-layout { flex-direction: row; } }
 
     /* Sidebar / Filtros */
-    .sidebar { width: 100%; flex-shrink: 0; }
+    .sidebar { width: 100%; flex-shrink: 0; display: none; } /* Oculto por defecto, se muestra via JS */
     @media (min-width: 768px) { .sidebar { width: 260px; position: sticky; top: 90px; align-self: flex-start;} }
     
     .filter-box { background: var(--primary); color: white; border-radius: var(--radius-md); padding: 20px; box-shadow: var(--shadow-md); }
     .filter-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-    .filter-group { margin-bottom: 20px; }
+    .filter-group { margin-bottom: 10px; }
     .filter-group-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 10px; opacity: 0.9; }
     
     .filter-option { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; cursor: pointer; }
-    .filter-option input[type="radio"], .filter-option input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
+    .filter-option input[type="radio"] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
     .filter-option span { font-size: 0.95rem; opacity: 0.9; }
     .filter-option:hover span { opacity: 1; }
 
     /* Contenido Principal del Catálogo */
     .catalog-content { flex: 1; min-width: 0; }
-    .breadcrumbs { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 0.9rem; color: var(--text-muted); flex-wrap: wrap; gap: 10px;}
+    
+    /* Controles Superiores: Breadcrumbs y Botón Volver */
+    .catalog-top-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;}
+    
+    .btn-back-home { display: flex; align-items: center; gap: 8px; color: var(--primary); font-weight: 800; font-size: 1rem; cursor: pointer; text-decoration: none; padding: 8px 16px; background: var(--bg-white); border: 1px solid var(--border-color); border-radius: 30px; transition: all 0.2s;}
+    .btn-back-home:hover { background: var(--bg-light); border-color: var(--primary); }
+    
+    .breadcrumbs { font-size: 0.9rem; color: var(--text-muted); }
     .breadcrumbs-path span { color: var(--primary); font-weight: 600; cursor: pointer; }
-    .global-price-link { color: var(--primary); font-weight: 800; text-decoration: underline; cursor: pointer; }
 
     .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
 
-    /* Tarjeta de Producto (Estilo Mockup) */
+    /* Tarjeta de Producto (Estilo Mockup Cuadrícula) */
     .product-card { background: var(--bg-white); border-radius: var(--radius-md); padding: 15px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); display: flex; flex-direction: column; transition: box-shadow 0.2s; }
     .product-card:hover { box-shadow: var(--shadow-md); }
     
-    .product-image-wrap { background: #F8F9FA; border-radius: var(--radius-sm); height: 200px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; position: relative; overflow: hidden; cursor: pointer;}
+    .product-image-wrap { background: #F8F9FA; border-radius: var(--radius-sm); height: 220px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; position: relative; overflow: hidden; cursor: pointer;}
     .product-image { max-width: 90%; max-height: 90%; object-fit: contain; }
-    .zoom-icon { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.4); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+    
+    /* Nuevo Icono de Lupa Profesional */
+    .zoom-icon { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+    .product-image-wrap:hover .zoom-icon { background: rgba(0,0,0,0.7); }
 
+    .product-info { display: flex; flex-direction: column; flex: 1; }
     .product-info h3 { font-size: 1.15rem; font-weight: 900; color: var(--primary); margin-bottom: 4px; line-height: 1.2; }
     .product-measure { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px; }
-    .price-table-link { font-size: 0.8rem; color: #2563EB; font-weight: 700; text-decoration: underline; margin-bottom: 15px; display: inline-block; cursor: pointer; }
+    
+    .price-table-link { font-size: 0.85rem; color: #2563EB; font-weight: 700; text-decoration: underline; margin-bottom: 15px; display: inline-block; cursor: pointer; }
 
     .input-label { font-size: 0.85rem; font-weight: 700; color: var(--primary); margin-bottom: 5px; display: block; }
     .color-select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 0.95rem; font-weight: 600; color: var(--text-dark); background: var(--bg-white); outline: none; margin-bottom: 15px; cursor: pointer; }
 
-    .qty-subtotal-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .qty-subtotal-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; margin-top: auto; }
     
     .stepper { display: flex; align-items: center; background: var(--bg-light); border-radius: var(--radius-sm); border: 1px solid var(--border-color); overflow: hidden; height: 36px;}
     .stepper-btn { background: transparent; border: none; width: 36px; height: 100%; font-size: 1.2rem; color: var(--text-dark); cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; }
     .stepper-btn:hover { background: #E5E7EB; }
-    .stepper-val { width: 40px; text-align: center; font-weight: 800; font-size: 1rem; color: var(--text-dark); border-left: 1px solid var(--border-color); border-right: 1px solid var(--border-color); height: 100%; display: flex; align-items: center; justify-content: center; background: var(--bg-white);}
+    .stepper-val { width: 45px; text-align: center; font-weight: 800; font-size: 1rem; color: var(--text-dark); border-left: 1px solid var(--border-color); border-right: 1px solid var(--border-color); height: 100%; display: flex; align-items: center; justify-content: center; background: var(--bg-white);}
     
     .subtotal-display { display: flex; flex-direction: column; align-items: flex-end; }
     .subtotal-label { font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; line-height: 1; }
-    .subtotal-val { font-size: 1.2rem; font-weight: 900; color: var(--primary); line-height: 1.2; }
+    .subtotal-val { font-size: 1.2rem; font-weight: 900; color: var(--success); line-height: 1.2; }
 
     .btn-add { background: var(--accent); color: white; font-weight: 800; font-size: 1rem; padding: 12px; border-radius: var(--radius-sm); border: none; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: background 0.2s; }
     .btn-add:hover { background: var(--accent-hover); }
 
-    /* --- MODALES Y NOTIFICACIONES (Reutilizados y adaptados) --- */
+    /* --- MODALES Y NOTIFICACIONES --- */
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 3000; justify-content: center; align-items: center; padding: 15px; opacity: 0; transition: opacity 0.3s;}
     .modal.active { display: flex; opacity: 1; }
-    .modal-content { background: var(--bg-white); width: 100%; max-width: 500px; border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; max-height: 90vh; transform: scale(0.95); transition: transform 0.3s; box-shadow: var(--shadow-lg);}
+    .modal-content { background: var(--bg-light); width: 100%; max-width: 500px; border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; max-height: 90vh; transform: scale(0.95); transition: transform 0.3s; box-shadow: var(--shadow-lg);}
     .modal.active .modal-content { transform: scale(1); }
     
-    .modal-header { padding: 20px; background: var(--bg-light); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-    .modal-header h2 { font-size: 1.3rem; font-weight: 900; color: var(--primary); }
-    .btn-close { background: transparent; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer; font-weight: bold; }
-    .modal-body { padding: 20px; overflow-y: auto; }
+    /* Header del modal más elegante */
+    .modal-header { padding: 20px 25px; background: var(--primary); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; color: white;}
+    .modal-header h2 { font-size: 1.4rem; font-weight: 900; margin: 0; display: flex; align-items: center; gap: 10px;}
+    .btn-close { background: rgba(255,255,255,0.2); border: none; font-size: 1.5rem; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s;}
+    .btn-close:hover { background: rgba(255,255,255,0.3); }
+    .modal-body { padding: 25px; overflow-y: auto; background: var(--bg-light); }
 
     /* Tabla de Precios Modal */
-    .price-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
-    .price-table td { padding: 12px; border-bottom: 1px solid var(--border-color); }
+    .price-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; background: white; border-radius: var(--radius-sm); overflow: hidden;}
+    .price-table td { padding: 15px; border-bottom: 1px solid var(--border-color); }
     .price-qty-col { font-weight: 600; color: var(--text-muted); }
-    .price-val-col { text-align: right; font-weight: 900; color: var(--primary); font-size: 1.1rem; }
+    .price-val-col { text-align: right; font-weight: 900; color: var(--primary); font-size: 1.2rem; }
 
-    /* Carrito Layout */
-    .cart-item { display: flex; gap: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); margin-bottom: 15px; }
-    .cart-item img { width: 70px; height: 70px; object-fit: contain; background: var(--bg-light); border-radius: var(--radius-sm); }
-    .cart-info { flex: 1; }
-    .cart-title { font-weight: 800; color: var(--primary); font-size: 1rem; line-height: 1.2; margin-bottom: 2px;}
-    .cart-color { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px; }
-    .cart-controls { display: flex; justify-content: space-between; align-items: center; }
-    .cart-remove { color: var(--danger); font-size: 0.85rem; font-weight: 700; background: none; border: none; cursor: pointer; text-decoration: underline; }
+    /* Carrito Layout Mejorado */
+    .cart-item { display: flex; gap: 15px; padding: 15px; background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); margin-bottom: 15px; border: 1px solid var(--border-color);}
+    .cart-item img { width: 80px; height: 80px; object-fit: contain; background: var(--bg-light); border-radius: var(--radius-sm); }
+    .cart-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between;}
+    .cart-title { font-weight: 800; color: var(--primary); font-size: 1.05rem; line-height: 1.2; margin-bottom: 4px;}
+    .cart-color { font-size: 0.85rem; color: var(--text-muted); font-weight: 600;}
     
-    .cart-summary { background: var(--bg-light); padding: 15px; border-radius: var(--radius-sm); margin-bottom: 20px; }
-    .summary-line { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 600; color: var(--text-muted); font-size: 0.95rem; }
-    .summary-total { display: flex; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 2px solid var(--border-color); font-weight: 900; color: var(--primary); font-size: 1.3rem; }
-
-    .btn-block { width: 100%; padding: 14px; border-radius: var(--radius-md); font-weight: 800; font-size: 1.1rem; cursor: pointer; border: none; text-align: center; }
-    .btn-primary { background: var(--accent); color: white; }
-    .btn-outline { background: transparent; border: 2px solid var(--border-color); color: var(--text-dark); margin-top: 10px; }
-
-    /* Formulario Checkout */
-    .form-control { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); margin-bottom: 15px; font-size: 1rem; font-family: inherit; }
+    .cart-controls { display: flex; justify-content: space-between; align-items: center; margin-top: 10px;}
+    .cart-remove { color: var(--danger); font-size: 0.85rem; font-weight: 700; background: #FEE2E2; border: none; padding: 4px 10px; border-radius: 20px; cursor: pointer; transition: background 0.2s; }
+    .cart-remove:hover { background: #FECACA; }
     
-    .notification { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--primary); color: white; padding: 12px 25px; border-radius: 30px; font-weight: 800; box-shadow: var(--shadow-lg); transition: transform 0.3s; z-index: 9999; }
+    .cart-summary { background: white; padding: 20px; border-radius: var(--radius-md); margin-bottom: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
+    .summary-line { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: 600; color: var(--text-muted); font-size: 1rem; }
+    .summary-total { display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 2px solid var(--border-color); font-weight: 900; color: var(--success); font-size: 1.4rem; }
+
+    .btn-block { width: 100%; padding: 16px; border-radius: var(--radius-md); font-weight: 800; font-size: 1.1rem; cursor: pointer; border: none; text-align: center; transition: transform 0.1s; }
+    .btn-block:active { transform: scale(0.98); }
+    .btn-primary { background: var(--accent); color: white; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3); margin-bottom: 10px;}
+    .btn-outline { background: white; border: 2px solid var(--border-color); color: var(--text-dark); }
+
+    /* Formulario Checkout Premium */
+    .checkout-header { font-size: 1.2rem; font-weight: 900; color: var(--primary); margin-bottom: 15px; }
+    .form-group { margin-bottom: 15px; }
+    .form-control { width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: var(--radius-md); font-size: 1rem; font-family: inherit; background: white; transition: border-color 0.2s; outline: none; font-weight: 500;}
+    .form-control:focus { border-color: var(--primary); }
+    
+    .notification { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--primary); color: white; padding: 14px 25px; border-radius: 30px; font-weight: 800; box-shadow: var(--shadow-lg); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 9999; }
     .notification.show { transform: translateX(-50%) translateY(0); }
     .notification.error { background: var(--danger); }
 
@@ -238,7 +258,6 @@
         <p class="hero-subtitle">Dale vida a tus productos con nuestras soluciones de embalaje personalizadas y de alta calidad.</p>
         <button class="btn-cta" onclick="goToCatalog('all')">Ver Catálogo</button>
       </div>
-      <!-- Imagen decorativa CSS de fondo sugerida para el hero -->
     </section>
 
     <h2 class="section-title">Nuestras Categorías</h2>
@@ -249,11 +268,11 @@
       </div>
       <div class="cat-card" onclick="goToCatalog('Bolsas')">
         <div class="cat-img">🛍️</div>
-        <div class="cat-info"><h3>Bolsas</h3><p>Encuentra la bolsa perfecta para cada necesidad.</p></div>
+        <div class="cat-info"><h3>Bolsas</h3><p>La bolsa ideal para tus productos.</p></div>
       </div>
       <div class="cat-card" onclick="goToCatalog('Tag')">
         <div class="cat-img">🏷️</div>
-        <div class="cat-info"><h3>Tags</h3><p>Encuentra el tag perfecto para tus productos.</p></div>
+        <div class="cat-info"><h3>Tags</h3><p>Detalles que marcan la diferencia.</p></div>
       </div>
       <div class="cat-card" onclick="goToCatalog('Papel Seda')">
         <div class="cat-img">📄</div>
@@ -277,12 +296,10 @@
   <div id="catalog-view" class="view">
     <div class="catalog-layout">
       
-      <!-- SIDEBAR -->
-      <aside class="sidebar">
+      <!-- SIDEBAR (Solo se muestra si entra por "Ver Catálogo" general) -->
+      <aside class="sidebar" id="desktopSidebar">
         <div class="filter-box">
           <h3 class="filter-title">Filtrar por</h3>
-          
-          <!-- Filtro Funcional: Categorías -->
           <div class="filter-group">
             <h4 class="filter-group-title">Categoría</h4>
             <label class="filter-option"><input type="radio" name="catFilter" value="all" checked onchange="filterCategory(this.value)"> <span>Todos</span></label>
@@ -292,30 +309,23 @@
             <label class="filter-option"><input type="radio" name="catFilter" value="Papel Seda" onchange="filterCategory(this.value)"> <span>Papel Seda</span></label>
             <label class="filter-option"><input type="radio" name="catFilter" value="Sticker" onchange="filterCategory(this.value)"> <span>Stickers</span></label>
           </div>
-
-          <!-- Filtros Visuales (Mock basados en la imagen) -->
-          <div class="filter-group" style="opacity: 0.6; pointer-events: none;" title="Próximamente">
-            <h4 class="filter-group-title">Material</h4>
-            <label class="filter-option"><input type="checkbox"> <span>Cartón corrugado</span></label>
-            <label class="filter-option"><input type="checkbox"> <span>Cartulina</span></label>
-            <label class="filter-option"><input type="checkbox"> <span>Plegadizo</span></label>
-          </div>
-          <div class="filter-group" style="opacity: 0.6; pointer-events: none;" title="Próximamente">
-            <h4 class="filter-group-title">Tamaño</h4>
-            <label class="filter-option"><input type="checkbox"> <span>Pequeño</span></label>
-            <label class="filter-option"><input type="checkbox"> <span>Mediano</span></label>
-            <label class="filter-option"><input type="checkbox"> <span>Grande</span></label>
-          </div>
+          <!-- Filtros de Material y Tamaño eliminados según solicitud -->
         </div>
       </aside>
 
       <!-- MAIN CONTENT -->
-      <main class="catalog-content">
-        <div class="breadcrumbs">
-          <div class="breadcrumbs-path">
-            <span onclick="showView('home')">Inicio</span> > <span onclick="goToCatalog('all')">Productos</span> <span id="breadCategory"></span>
+      <main class="catalog-content" id="mainCatalogContent">
+        <div class="catalog-top-controls">
+          <button class="btn-back-home" onclick="showView('home')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Volver al Inicio
+          </button>
+          
+          <div class="breadcrumbs">
+            <div class="breadcrumbs-path">
+              <span onclick="showView('home')">Inicio</span> > <span onclick="goToCatalog('all')">Productos</span> <span id="breadCategory"></span>
+            </div>
           </div>
-          <div class="global-price-link" onclick="openGlobalInfo()">Tabla de Precios por Volumen</div>
         </div>
 
         <div id="loadingIndicator" class="loader"></div>
@@ -332,7 +342,10 @@
   <div class="modal" id="cartModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>🛒 Tu Pedido</h2>
+        <h2>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+          Tu Pedido
+        </h2>
         <button class="btn-close" onclick="closeCart()">×</button>
       </div>
       <div class="modal-body" id="cartBody">
@@ -343,23 +356,23 @@
 
   <!-- Modal Precios -->
   <div class="modal" id="priceModal">
-    <div class="modal-content" style="max-width: 400px;">
+    <div class="modal-content" style="max-width: 400px; background: white;">
       <div class="modal-header">
-        <h2 id="priceModalTitle">Precios por Volumen</h2>
+        <h2 id="priceModalTitle" style="font-size: 1.2rem;">Precios por Volumen</h2>
         <button class="btn-close" onclick="closePriceModal()">×</button>
       </div>
       <div class="modal-body">
         <table class="price-table">
           <tbody id="priceTableBody"></tbody>
         </table>
-        <button class="btn-block btn-primary" onclick="closePriceModal()">Entendido</button>
+        <button class="btn-block btn-primary" style="margin-bottom: 0;" onclick="closePriceModal()">Entendido</button>
       </div>
     </div>
   </div>
 
   <!-- Modal Zoom -->
   <div class="modal" id="zoomModal" style="background: rgba(0,0,0,0.9);">
-    <button class="btn-close" style="position:absolute; top:20px; right:30px; color:white; font-size:2rem;" onclick="closeZoomModal()">×</button>
+    <button class="btn-close" style="position:absolute; top:20px; right:30px; font-size:2rem; width:50px; height:50px; background: rgba(255,255,255,0.2);" onclick="closeZoomModal()">×</button>
     <img src="" id="zoomImage" style="max-width: 90%; max-height: 90%; object-fit: contain; border-radius: 8px;">
   </div>
 
@@ -405,6 +418,17 @@
 
     function goToCatalog(category) {
       showView('catalog');
+      
+      const sidebar = document.getElementById('desktopSidebar');
+      const mainContent = document.getElementById('mainCatalogContent');
+
+      // Lógica de Sidebar Inteligente
+      if(category === 'all') {
+        sidebar.style.display = 'block';
+      } else {
+        sidebar.style.display = 'none';
+      }
+
       // Marcar radio button
       const radios = document.getElementsByName('catFilter');
       for(let i=0; i<radios.length; i++) {
@@ -453,12 +477,13 @@
       return priceTiers.tier5 || 0;
     }
 
-    // Lógica Matemática (Saltos de 25 en 25, y de 100 en 100)
     function updateQty(productId, isPlus) {
       const product = products.find(p => p.id === productId);
       const cat = product.category ? product.category.toLowerCase() : '';
       let min = 25, step = 25;
-      if (cat === 'tag') { min = 100; step = 100; } else if (cat === 'papel seda') { min = 50; step = 50; }
+      
+      if (cat === 'tag') { min = 100; step = 100; } 
+      else if (cat === 'papel seda') { min = 50; step = 50; }
 
       const display = document.getElementById(`qty-display-${productId}`);
       let current = parseInt(display.innerText) || min; 
@@ -481,7 +506,7 @@
       grid.innerHTML = '';
       const filtered = currentCategory === 'all' ? products : products.filter(p => p.category && p.category.toLowerCase() === currentCategory.toLowerCase());
       
-      if (filtered.length === 0) { grid.innerHTML = '<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: #666;">No hay productos en esta categoría.</div>'; return; }
+      if (filtered.length === 0) { grid.innerHTML = '<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: #666; font-weight: bold;">No hay productos en esta categoría.</div>'; return; }
 
       filtered.forEach(product => {
         const cat = product.category ? product.category.toLowerCase() : '';
@@ -494,12 +519,15 @@
             colorOptionsHtml = `<select class="color-select" id="color-${product.id}">${product.colors.map(c => `<option value="${c.trim()}">${c.trim()}</option>`).join('')}</select>`;
         } else { colorOptionsHtml = `<input type="hidden" id="color-${product.id}" value="Estándar"><div style="height:44px; margin-bottom:15px; color:#999; font-size:0.9rem; display:flex; align-items:center;">Color único</div>`; }
 
+        // Icono de Lupa Profesional en SVG
+        const zoomSvg = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>`;
+
         const card = document.createElement('div');
         card.className = 'product-card';
         card.innerHTML = `
           <div class="product-image-wrap" onclick="openZoom('${product.images[0]}')">
             <img src="${product.images[0]}" class="product-image" loading="lazy">
-            <div class="zoom-icon">🔍</div>
+            <div class="zoom-icon" title="Ampliar imagen">${zoomSvg}</div>
           </div>
           <div class="product-info">
             <h3>${product.name}</h3>
@@ -517,12 +545,15 @@
                 <button type="button" class="stepper-btn" onclick="updateQty('${product.id}', true)">+</button>
               </div>
               <div class="subtotal-display">
-                <span class="subtotal-label">Subtotal:</span>
+                <span class="subtotal-label">Subtotal</span>
                 <span class="subtotal-val" id="preview-${product.id}">$${initialTotal.toFixed(2)}</span>
               </div>
             </div>
             
-            <button class="btn-add" onclick="addToCart('${product.id}')">Agregar al Pedido 🛒</button>
+            <button class="btn-add" onclick="addToCart('${product.id}')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+              Agregar al Pedido
+            </button>
           </div>
         `;
         grid.appendChild(card);
@@ -604,7 +635,7 @@
     function renderCart() {
       const body = document.getElementById('cartBody');
       if (cart.length === 0) {
-        body.innerHTML = '<div style="text-align:center; padding: 40px 0;"><span style="font-size:3rem;">🛒</span><h3 style="margin-top:10px; color:#666;">Tu pedido está vacío</h3><button class="btn-outline btn-block" onclick="closeCart()">Explorar Productos</button></div>';
+        body.innerHTML = '<div style="text-align:center; padding: 40px 0;"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1" style="margin-bottom:15px;"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg><h3 style="margin-top:10px; color:#666;">Tu pedido está vacío</h3><button class="btn-outline btn-block" style="margin-top:20px;" onclick="closeCart()">Explorar Productos</button></div>';
         return;
       }
 
@@ -617,17 +648,19 @@
           <div class="cart-item">
             <img src="${item.image}">
             <div class="cart-info">
-              <div class="cart-title">${item.name}</div>
-              <div class="cart-color">Color: ${item.color}</div>
-              <div class="cart-controls">
-                <div class="stepper" style="height: 30px;">
-                  <button class="stepper-btn" style="width:30px;" onclick="updateCartItemQty(${index}, -1)">−</button>
-                  <div class="stepper-val" style="width:40px;">${item.quantity}</div>
-                  <button class="stepper-btn" style="width:30px;" onclick="updateCartItemQty(${index}, 1)">+</button>
-                </div>
-                <div style="font-weight:900; color:var(--primary);">$${item.total.toFixed(2)}</div>
+              <div>
+                <div class="cart-title">${item.name}</div>
+                <div class="cart-color">Color: ${item.color}</div>
               </div>
-              <div style="text-align:right; margin-top:5px;"><button class="cart-remove" onclick="removeFromCart(${index})">Eliminar</button></div>
+              <div class="cart-controls">
+                <div class="stepper" style="height: 32px; background: white;">
+                  <button class="stepper-btn" style="width:32px;" onclick="updateCartItemQty(${index}, -1)">−</button>
+                  <div class="stepper-val" style="width:40px; font-size:0.9rem;">${item.quantity}</div>
+                  <button class="stepper-btn" style="width:32px;" onclick="updateCartItemQty(${index}, 1)">+</button>
+                </div>
+                <div style="font-weight:900; color:var(--primary); font-size: 1.1rem;">$${item.total.toFixed(2)}</div>
+                <button class="cart-remove" onclick="removeFromCart(${index})">Quitar</button>
+              </div>
             </div>
           </div>`;
       });
@@ -643,11 +676,11 @@
       </div>
       
       <div id="checkoutContainer" style="display:none;">
-        <h3 style="margin-bottom:15px; color:var(--primary);">Datos de Entrega</h3>
-        <input type="text" id="cName" class="form-control" placeholder="Nombre completo">
-        <input type="email" id="cEmail" class="form-control" placeholder="Correo electrónico">
-        <input type="tel" id="cPhone" class="form-control" placeholder="Teléfono">
-        <textarea id="cAddress" class="form-control" placeholder="Dirección completa" rows="3"></textarea>
+        <div class="checkout-header">Detalles de Entrega</div>
+        <div class="form-group"><input type="text" id="cName" class="form-control" placeholder="Nombre completo"></div>
+        <div class="form-group"><input type="email" id="cEmail" class="form-control" placeholder="Correo electrónico"></div>
+        <div class="form-group"><input type="tel" id="cPhone" class="form-control" placeholder="Teléfono"></div>
+        <div class="form-group"><textarea id="cAddress" class="form-control" placeholder="Dirección completa" rows="3"></textarea></div>
         <button class="btn-block btn-primary" id="btnConfirm" onclick="processOrder()">Confirmar Orden</button>
         <button class="btn-block btn-outline" onclick="hideCheckout()">Volver al Carrito</button>
       </div>`;
@@ -673,7 +706,7 @@
         body: JSON.stringify({ customerName: name, customerEmail: email, customerPhone: phone, customerAddress: address, items: cart })
       }).then(() => {
         cart = []; updateCartHeader(); closeCart();
-        alert('¡Pedido exitoso! Nos pondremos en contacto contigo.'); // Usando alert simple para éxito según SPA mockup
+        alert('¡Pedido exitoso! Nos pondremos en contacto contigo.'); 
         showView('home');
       }).catch(() => {
         cart = []; updateCartHeader(); closeCart();
@@ -695,12 +728,6 @@
         <tr><td class="price-qty-col" style="border:none;">501+ u.</td><td class="price-val-col" style="border:none;">$${product.priceTiers.tier5.toFixed(2)}</td></tr>`;
       document.getElementById('priceModal').classList.add('active');
     }
-    
-    function openGlobalInfo() {
-        document.getElementById('priceModalTitle').textContent = `Información de Precios`;
-        document.getElementById('priceTableBody').innerHTML = `<tr><td colspan="2" style="text-align:center; color:#666;">Los descuentos por volumen se aplican automáticamente al aumentar la cantidad. Selecciona "Ver tabla de precios" en cada producto para ver sus tarifas específicas.</td></tr>`;
-        document.getElementById('priceModal').classList.add('active');
-    }
 
     function closePriceModal() { document.getElementById('priceModal').classList.remove('active'); }
     
@@ -718,5 +745,6 @@
   </script>
 </body>
 </html>
+
 
 
