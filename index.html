@@ -142,18 +142,18 @@
     .product-image-wrap { background: #F8F9FA; border-radius: var(--radius-sm); height: 220px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; position: relative; overflow: hidden; cursor: pointer;}
     .product-image { max-width: 90%; max-height: 90%; object-fit: contain; }
     
+    /* Controles del Slider de Imágenes */
+    .slide-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255, 255, 255, 0.8); color: var(--primary); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; opacity: 0; transition: opacity 0.2s, background 0.2s; z-index: 10; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
+    .product-image-wrap:hover .slide-arrow { opacity: 1; }
+    .slide-arrow:hover { background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.15);}
+    .slide-arrow.left { left: 5px; }
+    .slide-arrow.right { right: 5px; }
+    .slide-dots { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; z-index: 5; }
+    .slide-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(0,0,0,0.2); transition: background 0.2s; }
+    .slide-dot.active { background: var(--primary); }
+
     /* Nuevo Icono de Lupa Profesional */
-    .zoom-icon { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
-    .product-image-wrap:hover .zoom-icon { background: rgba(0,0,0,0.7); }
-
-    .product-info { display: flex; flex-direction: column; flex: 1; }
-    .product-info h3 { font-size: 1.15rem; font-weight: 900; color: var(--primary); margin-bottom: 4px; line-height: 1.2; }
-    .product-measure { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px; }
-    
-    .price-table-link { font-size: 0.85rem; color: #2563EB; font-weight: 700; text-decoration: underline; margin-bottom: 15px; display: inline-block; cursor: pointer; }
-
-    .input-label { font-size: 0.85rem; font-weight: 700; color: var(--primary); margin-bottom: 5px; display: block; }
-    .color-select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 0.95rem; font-weight: 600; color: var(--text-dark); background: var(--bg-white); outline: none; margin-bottom: 15px; cursor: pointer; }
+    .zoom-icon { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s; z-index: 15;}
 
     .qty-subtotal-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; margin-top: auto; }
     
@@ -395,6 +395,7 @@
     let cart = [];
     let currentCategory = 'all';
     const DELIVERY_FEE = 3.50;
+    let productSlideIndices = {}; // Controla la imagen actual de cada producto
 
     // --- Mocks Data Backup ---
     const mockProducts = [
@@ -509,6 +510,7 @@
       if (filtered.length === 0) { grid.innerHTML = '<div style="grid-column: 1/-1; padding: 40px; text-align: center; color: #666; font-weight: bold;">No hay productos en esta categoría.</div>'; return; }
 
       filtered.forEach(product => {
+        productSlideIndices[product.id] = 0; // Inicializamos el indice de imagen en 0
         const cat = product.category ? product.category.toLowerCase() : '';
         let min = 25;
         if (cat === 'tag') min = 100; else if (cat === 'papel seda') min = 50;
@@ -522,12 +524,26 @@
         // Icono de Lupa Profesional en SVG
         const zoomSvg = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>`;
 
+        // Flechas y Puntos si hay más de 1 imagen
+        let sliderArrows = '';
+        let sliderDots = '';
+        if (product.images.length > 1) {
+          sliderArrows = `
+            <button class="slide-arrow left" onclick="event.stopPropagation(); changeSlide('${product.id}', -1)">❮</button>
+            <button class="slide-arrow right" onclick="event.stopPropagation(); changeSlide('${product.id}', 1)">❯</button>
+          `;
+          let dots = product.images.map((_, i) => `<div class="slide-dot ${i===0?'active':''}" id="dot-${product.id}-${i}"></div>`).join('');
+          sliderDots = `<div class="slide-dots">${dots}</div>`;
+        }
+
         const card = document.createElement('div');
         card.className = 'product-card';
         card.innerHTML = `
-          <div class="product-image-wrap" onclick="openZoom('${product.images[0]}')">
-            <img src="${product.images[0]}" class="product-image" loading="lazy">
-            <div class="zoom-icon" title="Ampliar imagen">${zoomSvg}</div>
+          <div class="product-image-wrap" onclick="openZoom('${product.id}')">
+            <img src="${product.images[0]}" class="product-image" id="img-${product.id}" loading="lazy">
+            ${sliderArrows}
+            ${sliderDots}
+            <div class="zoom-icon" title="Ampliar imagen" onclick="event.stopPropagation(); openZoom('${product.id}')">${zoomSvg}</div>
           </div>
           <div class="product-info">
             <h3>${product.name}</h3>
@@ -565,6 +581,22 @@
       const display = document.getElementById(`qty-display-${productId}`);
       const quantity = parseInt(display.innerText);
       document.getElementById(`preview-${productId}`).textContent = `$${(calculatePrice(quantity, product.priceTiers) * quantity).toFixed(2)}`;
+    }
+
+    // Funciones del Slider
+    function changeSlide(productId, dir) {
+      const product = products.find(p => p.id === productId);
+      let idx = productSlideIndices[productId] + dir;
+      if (idx >= product.images.length) idx = 0;
+      if (idx < 0) idx = product.images.length - 1;
+      productSlideIndices[productId] = idx;
+      
+      document.getElementById(`img-${productId}`).src = product.images[idx];
+      
+      const wrap = document.getElementById(`img-${productId}`).parentElement;
+      wrap.querySelectorAll('.slide-dot').forEach(d => d.classList.remove('active'));
+      const activeDot = wrap.querySelector(`#dot-${productId}-${idx}`);
+      if (activeDot) activeDot.classList.add('active');
     }
 
     // --- CARRITO DE COMPRAS ---
@@ -731,7 +763,13 @@
 
     function closePriceModal() { document.getElementById('priceModal').classList.remove('active'); }
     
-    function openZoom(imgUrl) { document.getElementById('zoomImage').src = imgUrl; document.getElementById('zoomModal').classList.add('active'); }
+    function openZoom(productId) { 
+      const product = products.find(p => p.id === productId);
+      const currentIdx = productSlideIndices[productId] || 0;
+      document.getElementById('zoomImage').src = product.images[currentIdx]; 
+      document.getElementById('zoomModal').classList.add('active'); 
+    }
+    
     function closeZoomModal() { document.getElementById('zoomModal').classList.remove('active'); }
 
     let toastTimer;
@@ -745,6 +783,7 @@
   </script>
 </body>
 </html>
+
 
 
 
